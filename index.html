@@ -438,6 +438,22 @@ function openSheet(it){
   open=true; armDelete=false; drawSheet();
 }
 function closeSheet(){open=false;draft=null;$("scrim").hidden=true;$("scrim").innerHTML="";document.body.style.overflow=""}
+const SIGK=["title","brand","size","category","condition","price","description","notes","buyer","soldPrice","carrier","tracking","status"];
+const imgKey=p=>p?(p.id||p.data||""):"";
+const sig=o=>o?JSON.stringify([SIGK.map(k=>o[k]??""),(o.photos||[]).map(imgKey),imgKey(o.shipCode),imgKey(o.trackPhoto)]):"";
+async function closeAndSave(){
+  readForm();
+  if(pending){toast("Wacht tot de foto's klaar zijn met uploaden");return}
+  const d=draft; if(!d) return closeSheet();
+  const orig=items.find(i=>i.id===d.id);
+  if(sig(d)===sig(orig)) return closeSheet();
+  const hasImages=(d.photos||[]).length||d.shipCode||d.trackPhoto;
+  if(!orig&&!d.title&&!hasImages) return closeSheet();
+  if(!d.title&&orig) d.title=orig.title;
+  delete d.example;
+  closeSheet();
+  try{await saveItem(d);toast("Opgeslagen")}catch(_){}
+}
 function stepIdx(){return STATUSES.findIndex(s=>s.k===draft.status)}
 function drawSheet(){
   const d=draft, si=stepIdx(), isNew=!items.some(i=>i.id===d.id);
@@ -513,12 +529,12 @@ $("scrim").addEventListener("change",e=>{
 $("scrim").addEventListener("click",async e=>{
   const cl=e.target.closest("a[data-copy]");
   if(cl){readForm(); if(draft&&draft.tracking){navigator.clipboard?.writeText(draft.tracking).then(()=>toast("Nummer gekopieerd. Plak het op Vinted Go."),()=>{})} return}
-  if(e.target===$("scrim")){readForm();return closeSheet()}
+  if(e.target===$("scrim")){return closeAndSave()}
   const rm=e.target.closest("[data-rm]");
   if(rm){const [p]=draft.photos.splice(+rm.dataset.rm,1); if(p&&p.id&&!items.some(i=>(i.photos||[]).some(x=>x.id===p.id))){try{await assets.delete(p.id)}catch(_){}} refreshSheetPhotos();return}
   const b=e.target.closest("[data-act]"); if(!b) return;
   const act=b.dataset.act;
-  if(act==="close"){return closeSheet()}
+  if(act==="close"){return closeAndSave()}
   readForm();
   if(act==="copy"){return copy(listingText(draft))}
   if(act==="copytrack"){try{await navigator.clipboard.writeText(draft.tracking);toast("Nummer gekopieerd")}catch(_){toast(draft.tracking)};return}
@@ -543,7 +559,7 @@ $("scrim").addEventListener("click",async e=>{
     if(act==="go:shipped"&&open){draft=it;drawSheet();$("scrim").querySelector(".sheet").scrollTop=0;toast("Op verzonden gezet");return}
     closeSheet(); toast(act==="save"?"Opgeslagen":"Verplaatst naar "+STATUSES.find(s=>s.k===it.status).label)}catch(_){}
 });
-document.addEventListener("keydown",e=>{if(e.key!=="Escape") return; if(!$("viewer").hidden) return hideViewer(); if(open){readForm();closeSheet()}});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape") return; if(!$("viewer").hidden) return hideViewer(); if(open){closeAndSave()}});
 
 let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400)}
 boot();
