@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -148,54 +148,54 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none;color:var(--in
 <div class="wrap">
   <header>
     <div>
-      <div class="label">Seller log</div>
+      <div class="label">Verkopen op Vinted</div>
       <h1>Verzented</h1>
     </div>
-    <p class="note">Snap a photo, copy the listing text into Vinted, then track each piece from sold to delivered.</p>
+    <p class="note">Maak een foto, kopieer de advertentietekst naar Vinted en volg elk item van verkocht tot bezorgd.</p>
   </header>
   
 
-  <section class="stats" aria-label="Summary">
-    <div class="stat" id="stShip"><div class="label">To ship</div><b id="nShip">0</b></div>
+  <section class="stats" aria-label="Overzicht">
+    <div class="stat" id="stShip"><div class="label">Te verzenden</div><b id="nShip">0</b></div>
     <div class="stat"><div class="label">Online</div><b id="nOnline">0</b></div>
-    <div class="stat"><div class="label">Listed value</div><b id="vOnline">€0</b></div>
-    <div class="stat"><div class="label">Earned</div><b id="vEarned">€0</b></div>
+    <div class="stat"><div class="label">Waarde online</div><b id="vOnline">€0</b></div>
+    <div class="stat"><div class="label">Verdiend</div><b id="vEarned">€0</b></div>
   </section>
 
-  <nav class="rail" id="rail" aria-label="Filter by status"></nav>
+  <nav class="rail" id="rail" aria-label="Filter op status"></nav>
   <section class="grid" id="grid" aria-live="polite"></section>
   <footer class="foot">
-    <p>Everything is saved on this phone only. Make a backup now and then, so nothing is lost if the app is removed.</p>
-    <div class="row"><button class="btn" type="button" id="exportBtn">Save backup</button>
-    <label class="btn">Restore backup<input type="file" id="importIn" accept="application/json,.json" class="hid"></label></div>
+    <p>Alles wordt alleen op deze telefoon bewaard. Maak af en toe een back-up, zodat je niets kwijtraakt als de app wordt verwijderd.</p>
+    <div class="row"><button class="btn" type="button" id="exportBtn">Back-up maken</button>
+    <label class="btn">Back-up terugzetten<input type="file" id="importIn" accept="application/json,.json" class="hid"></label></div>
   </footer>
 </div>
 
-<button class="fab" id="addBtn" type="button"><span aria-hidden="true">＋</span> Add item</button>
+<button class="fab" id="addBtn" type="button"><span aria-hidden="true">＋</span> Item toevoegen</button>
 <div class="scrim" id="scrim" hidden></div>
 <div class="toast" id="toast" hidden></div>
-<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Shipping code"></div>
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Verzendcode"></div>
 
 <script>
 const STATUSES=[
-  {k:"draft",label:"To list"},
+  {k:"draft",label:"Klaarzetten"},
   {k:"listed",label:"Online"},
-  {k:"sold",label:"Sold"},
-  {k:"shipped",label:"Shipped"},
-  {k:"done",label:"Completed"}];
-const CATS=["Tops & shirts","Trousers & jeans","Dresses & skirts","Jackets & coats","Shoes","Bags & accessories","Kids","Other"];
-const CONDS=["New with tags","New without tags","Very good","Good","Satisfactory"];
-const CARRIERS=["Vinted Go","PostNL","DHL","DPD","GLS","UPS","Other"];
+  {k:"sold",label:"Verkocht"},
+  {k:"shipped",label:"Verzonden"},
+  {k:"done",label:"Afgerond"}];
+const CATS=["Tops & shirts","Broeken & jeans","Jurken & rokken","Jassen & vesten","Schoenen","Tassen & accessoires","Kinderen","Overig"];
+const CONDS=["Nieuw met prijskaartje","Nieuw zonder prijskaartje","Zeer goed","Goed","Redelijk"];
+const CARRIERS=["Vinted Go","PostNL","DHL","DPD","GLS","UPS","Overig"];
 const ICONS={
   "Tops & shirts":'<path d="M22 10l-12 8 6 10 6-3v29h20V25l6 3 6-10-12-8c-2 4-6 6-10 6s-8-2-10-6z"/>',
-  "Trousers & jeans":'<path d="M18 8h28l4 50h-11l-7-34-7 34H14z"/>',
-  "Dresses & skirts":'<path d="M24 8h16l-2 14 14 36H12l14-36z"/>',
-  "Jackets & coats":'<path d="M24 8l-14 8v42h18V20l4 10 4-10v38h18V16L40 8l-8 10z"/>',
-  "Shoes":'<path d="M8 40V24h12c2 6 8 8 16 9l16 3c4 1 6 4 6 8v2H8z"/>',
-  "Bags & accessories":'<path d="M14 24h36l-3 32H17zM24 24v-6a8 8 0 0116 0v6" fill="none" stroke="currentColor" stroke-width="4"/>',
-  "Kids":'<path d="M24 14l-10 6 4 8 4-2v22h20V26l4 2 4-8-10-6c-2 3-4 4-8 4s-6-1-8-4z"/>',
-  "Other":'<rect x="14" y="14" width="36" height="36" rx="6"/>'};
-const icon=c=>`<svg viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">${ICONS[c]||ICONS.Other}</svg>`;
+  "Broeken & jeans":'<path d="M18 8h28l4 50h-11l-7-34-7 34H14z"/>',
+  "Jurken & rokken":'<path d="M24 8h16l-2 14 14 36H12l14-36z"/>',
+  "Jassen & vesten":'<path d="M24 8l-14 8v42h18V20l4 10 4-10v38h18V16L40 8l-8 10z"/>',
+  "Schoenen":'<path d="M8 40V24h12c2 6 8 8 16 9l16 3c4 1 6 4 6 8v2H8z"/>',
+  "Tassen & accessoires":'<path d="M14 24h36l-3 32H17zM24 24v-6a8 8 0 0116 0v6" fill="none" stroke="currentColor" stroke-width="4"/>',
+  "Kinderen":'<path d="M24 14l-10 6 4 8 4-2v22h20V26l4 2 4-8-10-6c-2 3-4 4-8 4s-6-1-8-4z"/>',
+  "Overig":'<rect x="14" y="14" width="36" height="36" rx="6"/>'};
+const icon=c=>`<svg viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">${ICONS[c]||ICONS.Overig}</svg>`;
 const eur=n=>"€"+(Number(n)||0).toLocaleString("nl-NL",{minimumFractionDigits:Number(n)%1?2:0,maximumFractionDigits:2});
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const $=id=>document.getElementById(id);
@@ -236,12 +236,12 @@ async function saveItem(it){
   it.updatedAt=Date.now();
   const clean=JSON.parse(JSON.stringify(it));
   for(const p of [...(clean.photos||[]),clean.shipCode,clean.trackPhoto].filter(Boolean)) delete p.url;
-  try{await tx("items","readwrite",st=>st.put(clean))}catch(e){toast("Couldn't save. The phone's storage may be full.");throw e}
+  try{await tx("items","readwrite",st=>st.put(clean))}catch(e){toast("Opslaan lukt niet. De opslag van de telefoon is misschien vol.");throw e}
   const i=items.findIndex(x=>x.id===it.id); if(i>=0) items[i]=clean; else items.push(clean); render();
 }
 async function removeItem(it){
   for(const p of [...(it.photos||[]),it.shipCode,it.trackPhoto].filter(Boolean)) if(p.id){try{await assets.delete(p.id)}catch(e){}}
-  try{await tx("items","readwrite",st=>st.delete(it.id))}catch(e){toast("Couldn't delete. Try again.")}
+  try{await tx("items","readwrite",st=>st.delete(it.id))}catch(e){toast("Verwijderen lukt niet. Probeer het opnieuw.")}
   items=items.filter(x=>x.id!==it.id); render();
 }
 async function boot(){
@@ -252,7 +252,7 @@ async function boot(){
     await new Promise((res,rej)=>{const t=d.transaction("photos","readonly");const c=t.objectStore("photos").openCursor();
       c.onsuccess=()=>{const cur=c.result;if(cur){urlCache.set(cur.key,URL.createObjectURL(cur.value));cur.continue()}};
       t.oncomplete=res;t.onerror=()=>rej(t.error)});
-  }catch(e){toast("Couldn't open saved items on this phone.")}
+  }catch(e){toast("De opgeslagen items op deze telefoon konden niet worden geopend.")}
   render();
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 }
@@ -268,7 +268,7 @@ async function exportBackup(){
     if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
     const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
     setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
-  }catch(e){if(e&&e.name!=="AbortError") toast("Backup failed. Try again.")}
+  }catch(e){if(e&&e.name!=="AbortError") toast("Back-up maken mislukt. Probeer het opnieuw.")}
 }
 async function importBackup(file){
   try{
@@ -279,8 +279,8 @@ async function importBackup(file){
       if(!urlCache.has(id)) urlCache.set(id,URL.createObjectURL(b));
     }
     for(const it of data.items){await tx("items","readwrite",st=>st.put(it)); const i=items.findIndex(x=>x.id===it.id); if(i>=0) items[i]=it; else items.push(it)}
-    render(); toast("Restored "+data.items.length+" items");
-  }catch(e){toast("That file isn't a Verzented backup.")}
+    render(); toast(data.items.length+" items teruggezet");
+  }catch(e){toast("Dit bestand is geen back-up van Verzented.")}
 }
 $("exportBtn").addEventListener("click",exportBackup);
 $("importIn").addEventListener("change",e=>{if(e.target.files[0]) importBackup(e.target.files[0]); e.target.value=""});
@@ -305,7 +305,7 @@ async function addPhotos(files){
     pending++; refreshSheetPhotos();
     try{
       const b=await shrink(f,1400,.86); const r=await assets.upload(b); draft.photos.push({id:r.id})
-    }catch(e){toast("That photo didn't upload. Try a JPG or PNG under 20 MB.")}
+    }catch(e){toast("Die foto kon niet worden opgeslagen. Probeer een JPG of PNG kleiner dan 20 MB.")}
     finally{pending--; refreshSheetPhotos()}
   }
 }
@@ -313,10 +313,10 @@ const photoSrc=p=>p.data||(p.id&&urlCache.get(p.id))||"";
 
 /* ---------- shipping code + track & trace photos ---------- */
 const SLOTS={
-  shipCode:{add:"Add the QR code or label barcode",hint:"Photograph the label, or upload a screenshot of the QR code from the Vinted app.",
-    saved:"Shipping code saved",show:"Show at drop-off",busy:"Saving the code…"},
-  trackPhoto:{add:"Add the track & trace",hint:"Photograph the drop-off receipt, or upload a screenshot of the tracking from Vinted or Vinted Go.",
-    saved:"Track & trace saved",show:"View full screen",busy:"Saving the photo…"}};
+  shipCode:{add:"Voeg de QR-code of barcode toe",hint:"Maak een foto van het label, of upload een screenshot van de QR-code uit de Vinted-app.",
+    saved:"Verzendcode opgeslagen",show:"Toon bij inleveren",busy:"Code opslaan…"},
+  trackPhoto:{add:"Voeg de track & trace toe",hint:"Maak een foto van het verzendbewijs, of upload een screenshot van de tracking uit Vinted of Vinted Go.",
+    saved:"Track & trace opgeslagen",show:"Volledig scherm",busy:"Foto opslaan…"}};
 let busySlot=null, reading=false;
 function guessCarrier(code){
   return /^VGS/.test(code)?"Vinted Go":/^3S/.test(code)?"PostNL":/^(JVGL|JJD)/.test(code)?"DHL":/^\d{14}$/.test(code)?"DPD":/^1Z/.test(code)?"UPS":"";
@@ -348,9 +348,9 @@ async function readTracking(blob){
     const {data}=await w.recognize(blob);
     const r=parseTrack(data.text);
     if(!draft) return;
-    if(r.code){draft.tracking=r.code; if(r.carrier) draft.carrier=r.carrier; toast("Found "+r.code+(r.carrier?" · "+r.carrier:"")+". Check it matches the photo.")}
-    else toast("Photo saved, but no number was readable. Type it below.");
-  }catch(e){toast(navigator.onLine?"Photo saved, but it couldn't be read. Type the number below.":"Photo saved. Reading the number needs internet the first time.")}
+    if(r.code){draft.tracking=r.code; if(r.carrier) draft.carrier=r.carrier; toast("Gevonden: "+r.code+(r.carrier?" · "+r.carrier:"")+". Controleer of het klopt met de foto.")}
+    else toast("Foto opgeslagen, maar er was geen nummer leesbaar. Typ het hieronder in.");
+  }catch(e){toast(navigator.onLine?"Foto opgeslagen, maar hij kon niet worden gelezen. Typ het nummer hieronder in.":"Foto opgeslagen. Voor het lezen van het nummer is de eerste keer internet nodig.")}
   finally{reading=false; if(open) drawSheet()}
 }
 async function addSlotImage(slot,file){
@@ -363,7 +363,7 @@ async function addSlotImage(slot,file){
     if(old&&old.id&&!items.some(i=>i[slot]&&i[slot].id===old.id)){try{await assets.delete(old.id)}catch(_){}}
     delete draft.shipCodeText;
     if(slot==="trackPhoto"){busySlot=null;await readTracking(b)} else toast(SLOTS[slot].saved);
-  }catch(e){toast("That image didn't save. Try a JPG or PNG under 20 MB.")}
+  }catch(e){toast("Die afbeelding kon niet worden opgeslagen. Probeer een JPG of PNG kleiner dan 20 MB.")}
   finally{busySlot=null;pending--;if(open) drawSheet()}
 }
 function slotBlock(d,slot){
@@ -371,19 +371,19 @@ function slotBlock(d,slot){
   if(busySlot===slot) return `<div class="code"><div class="codeinfo"><b>${t.busy}</b></div></div>`;
   if(!c) return `<div class="code"><div class="codeinfo"><b>${t.add}</b>
     <span class="muted">${t.hint}</span>
-    <div class="row"><label class="btn">Take photo<input type="file" id="f-cam-${slot}" data-slot="${slot}" accept="image/*" capture="environment" class="hid"></label>
-    <label class="btn">Upload screenshot<input type="file" id="f-lib-${slot}" data-slot="${slot}" accept="image/*" class="hid"></label></div></div></div>`;
+    <div class="row"><label class="btn">Foto maken<input type="file" id="f-cam-${slot}" data-slot="${slot}" accept="image/*" capture="environment" class="hid"></label>
+    <label class="btn">Screenshot uploaden<input type="file" id="f-lib-${slot}" data-slot="${slot}" accept="image/*" class="hid"></label></div></div></div>`;
   return `<div class="code"><button type="button" class="codeimg" data-act="show:${slot}" aria-label="${t.show}"><img src="${esc(photoSrc(c))}" alt="${t.saved}"></button>
     <div class="codeinfo"><b>${t.saved}</b>
     <div class="row"><button class="btn primary" type="button" data-act="show:${slot}">${t.show}</button>
-    <button class="btn ghost" type="button" data-act="rm:${slot}">Remove</button></div></div></div>`;
+    <button class="btn ghost" type="button" data-act="rm:${slot}">Verwijderen</button></div></div></div>`;
 }
 const codeBlock=d=>slotBlock(d,"shipCode");
 let wake=null;
 async function showViewer(slot){
   const d=draft; if(!d||!d[slot]) return;
   const v=$("viewer");
-  v.innerHTML=`<div class="vh"><span>${esc(d.title||"Parcel")}</span><button type="button" id="vclose">Done</button></div>
+  v.innerHTML=`<div class="vh"><span>${esc(d.title||"Pakket")}</span><button type="button" id="vclose">Klaar</button></div>
     <img src="${esc(photoSrc(d[slot]))}" alt="${SLOTS[slot].saved}">
     <div class="vc">${esc(d.tracking||"")}</div>`;
   v.hidden=false; $("vclose").focus();
@@ -400,13 +400,13 @@ function render(){
   $("nOnline").textContent=by("listed").length;
   $("vOnline").textContent=eur(by("listed").reduce((a,i)=>a+(+i.price||0),0));
   $("vEarned").textContent=eur(items.filter(i=>["sold","shipped","done"].includes(i.status)).reduce((a,i)=>a+(+(i.soldPrice||i.price)||0),0));
-  $("rail").innerHTML=[{k:"all",label:"All"},...STATUSES].map(s=>{
+  $("rail").innerHTML=[{k:"all",label:"Alles"},...STATUSES].map(s=>{
     const n=s.k==="all"?items.length:by(s.k).length;
     return `<button class="chip" type="button" data-f="${s.k}" aria-pressed="${filter===s.k}">${s.label}<span>${n}</span></button>`}).join("");
   const order={sold:0,listed:1,draft:2,shipped:3,done:4};
   const list=items.filter(i=>filter==="all"||i.status===filter).sort((a,b)=>(order[a.status]-order[b.status])||((b.updatedAt||0)-(a.updatedAt||0)));
   if(!list.length){
-    $("grid").innerHTML=`<div class="empty" style="grid-column:1/-1">${items.length?"Nothing in this stage yet.":"Your rack is empty. Tap <b>Add item</b> to photograph your first piece."}</div>`;return}
+    $("grid").innerHTML=`<div class="empty" style="grid-column:1/-1">${items.length?"Nog niets in deze stap.":"Nog geen items. Tik op <b>Item toevoegen</b> om je eerste kledingstuk te fotograferen."}</div>`;return}
   $("grid").innerHTML=list.map(it=>{
     const st=STATUSES.find(s=>s.k===it.status)||STATUSES[0];
     const ph=(it.photos||[])[0];
@@ -415,13 +415,13 @@ function render(){
     return `<button class="card${it.status==="sold"?" attn":""}" type="button" data-id="${esc(it.id)}">
       <div class="thumb">${ph?`<img src="${esc(photoSrc(ph))}" alt="" loading="lazy">`:icon(it.category)}
         ${price?`<span class="tag">${eur(price)}</span>`:""}
-        ${(it.photos||[]).length>1?`<span class="count">${it.photos.length} photos</span>`:""}</div>
+        ${(it.photos||[]).length>1?`<span class="count">${it.photos.length} foto's</span>`:""}</div>
       <div class="body">
-        <div class="row"><span class="pill s-${st.k}">${it.status==="sold"?"Sold · ship it":st.label}</span>${it.example?'<span class="ex">Example</span>':""}</div>
-        <h3>${esc(it.title||"Untitled item")}</h3>
-        <div class="meta">${esc([it.brand,it.size&&"Size "+it.size,it.condition].filter(Boolean).join(" · "))||"&nbsp;"}</div>
-        ${it.buyer&&it.status!=="draft"&&it.status!=="listed"?`<div class="meta">Buyer: ${esc(it.buyer)}</div>`:""}
-        ${it.shipCode&&it.status==="sold"?'<span class="qrmark">▦ Shipping code ready</span>':""}${it.trackPhoto&&it.status==="shipped"?'<span class="qrmark">✓ Track &amp; trace saved</span>':""}
+        <div class="row"><span class="pill s-${st.k}">${it.status==="sold"?"Verkocht · verzenden":st.label}</span>${it.example?'<span class="ex">Voorbeeld</span>':""}</div>
+        <h3>${esc(it.title||"Item zonder titel")}</h3>
+        <div class="meta">${esc([it.brand,it.size&&"Maat "+it.size,it.condition].filter(Boolean).join(" · "))||"&nbsp;"}</div>
+        ${it.buyer&&it.status!=="draft"&&it.status!=="listed"?`<div class="meta">Koper: ${esc(it.buyer)}</div>`:""}
+        ${it.shipCode&&it.status==="sold"?'<span class="qrmark">▦ Verzendcode klaar</span>':""}${it.trackPhoto&&it.status==="shipped"?'<span class="qrmark">✓ Track &amp; trace opgeslagen</span>':""}
         ${tu&&(it.status==="shipped"||it.status==="done")?`<div class="meta">${esc(it.carrier)} · <span class="track">${esc(it.tracking)}</span></div>`:""}
       </div></button>`}).join("");
 }
@@ -434,7 +434,7 @@ let draft=null, open=false, pending=0, armDelete=false;
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 function opt(list,v){return list.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}
 function openSheet(it){
-  draft=it?structuredClone(it):{id:uid(),status:"draft",photos:[],category:"Tops & shirts",condition:"Very good",carrier:"PostNL",createdAt:Date.now()};
+  draft=it?structuredClone(it):{id:uid(),status:"draft",photos:[],category:"Tops & shirts",condition:"Zeer goed",carrier:"PostNL",createdAt:Date.now()};
   open=true; armDelete=false; drawSheet();
 }
 function closeSheet(){open=false;draft=null;$("scrim").hidden=true;$("scrim").innerHTML="";document.body.style.overflow=""}
@@ -443,56 +443,56 @@ function drawSheet(){
   const d=draft, si=stepIdx(), isNew=!items.some(i=>i.id===d.id);
   const tu=trackUrl(d);
   const nextBlock={
-    draft:`<p>Ready to post? Copy the listing text, paste it into Vinted with your photos, then mark it online.</p>
-      <div class="r row"><button class="btn" type="button" data-act="copy">Copy listing text</button><button class="btn primary" type="button" data-act="go:listed">Mark as online</button></div>`,
-    listed:`<p>Got a buyer? Note who bought it and the final price.</p>
-      <div class="f2"><label class="fld">Buyer (Vinted username)<input type="text" id="f-buyer" value="${esc(d.buyer)}" autocomplete="off"></label>
-      <label class="fld">Sold for (€)<input type="number" id="f-soldPrice" inputmode="decimal" step="0.5" min="0" value="${esc(d.soldPrice??d.price??"")}"></label></div>
-      <div class="r row"><button class="btn primary" type="button" data-act="go:sold">Mark as sold</button></div>`,
-    sold:`<p>Get the shipping label or QR code in Vinted, add it here, and drop off the parcel.</p>
+    draft:`<p>Klaar om te plaatsen? Kopieer de advertentietekst, plak die met je foto's in Vinted en zet het item daarna op online.</p>
+      <div class="r row"><button class="btn" type="button" data-act="copy">Advertentietekst kopiëren</button><button class="btn primary" type="button" data-act="go:listed">Zet op online</button></div>`,
+    listed:`<p>Verkocht? Noteer wie het kocht en voor welke prijs.</p>
+      <div class="f2"><label class="fld">Koper (Vinted-gebruikersnaam)<input type="text" id="f-buyer" value="${esc(d.buyer)}" autocomplete="off"></label>
+      <label class="fld">Verkocht voor (€)<input type="number" id="f-soldPrice" inputmode="decimal" step="0.5" min="0" value="${esc(d.soldPrice??d.price??"")}"></label></div>
+      <div class="r row"><button class="btn primary" type="button" data-act="go:sold">Zet op verkocht</button></div>`,
+    sold:`<p>Haal het verzendlabel of de QR-code op in Vinted, voeg die hier toe en lever het pakket in.</p>
       ${codeBlock(d)}
-      <div class="r row"><button class="btn primary" type="button" data-act="go:shipped">Mark as shipped</button></div>`,
-    shipped:`<p>Your parcel is on its way. Add a photo of the shipping proof and the number and carrier fill in for you.</p>
+      <div class="r row"><button class="btn primary" type="button" data-act="go:shipped">Zet op verzonden</button></div>`,
+    shipped:`<p>Je pakket is onderweg. Voeg een foto van het verzendbewijs toe, dan worden het nummer en de vervoerder vanzelf ingevuld.</p>
       ${slotBlock(d,"trackPhoto")}
-      ${reading?'<p class="muted">Reading the number…</p>':""}
-      <div class="f2"><label class="fld">Carrier<select id="f-carrier">${opt(CARRIERS,d.carrier)}</select></label>
-      <label class="fld">Track &amp; trace number<input type="text" id="f-tracking" value="${esc(d.tracking)}" autocomplete="off" autocapitalize="characters" class="mono"></label></div>
+      ${reading?'<p class="muted">Nummer lezen…</p>':""}
+      <div class="f2"><label class="fld">Vervoerder<select id="f-carrier">${opt(CARRIERS,d.carrier)}</select></label>
+      <label class="fld">Track &amp; trace-nummer<input type="text" id="f-tracking" value="${esc(d.tracking)}" autocomplete="off" autocapitalize="characters" class="mono"></label></div>
       <div class="r row">
-        ${d.tracking?`<button class="btn" type="button" data-act="copytrack">Copy number</button>`:""}
-        ${(!d.carrier||d.carrier==="Vinted Go")?`<a class="btn" href="https://vintedgo.com/tracking" target="_blank" rel="noopener" data-copy="1">Open vintedgo.com ↗</a>`:(tu?`<a class="btn" href="${esc(tu)}" target="_blank" rel="noopener">Track on ${esc(d.carrier)} ↗</a>`:"")}
-        ${d.tracking?`<a class="btn" href="https://t.17track.net/en#nums=${encodeURIComponent(d.tracking)}" target="_blank" rel="noopener">Live status ↗</a>`:""}
+        ${d.tracking?`<button class="btn" type="button" data-act="copytrack">Nummer kopiëren</button>`:""}
+        ${(!d.carrier||d.carrier==="Vinted Go")?`<a class="btn" href="https://vintedgo.com/tracking" target="_blank" rel="noopener" data-copy="1">Open vintedgo.com ↗</a>`:(tu?`<a class="btn" href="${esc(tu)}" target="_blank" rel="noopener">Volgen bij ${esc(d.carrier)} ↗</a>`:"")}
+        ${d.tracking?`<a class="btn" href="https://t.17track.net/en#nums=${encodeURIComponent(d.tracking)}" target="_blank" rel="noopener">Actuele status ↗</a>`:""}
       </div>
-      <div class="r row"><button class="btn primary" type="button" data-act="go:done">Delivered, mark completed</button></div>`,
-    done:`<p>Sold to ${esc(d.buyer||"a buyer")} for <b class="mono">${eur(d.soldPrice||d.price)}</b>.${d.tracking?` Tracking: <span class="mono">${esc(d.tracking)}</span>${d.carrier?" ("+esc(d.carrier)+")":""}.`:""}</p>${d.trackPhoto?'<div class="r row"><button class="btn" type="button" data-act="show:trackPhoto">View track &amp; trace</button></div>':""}`
+      <div class="r row"><button class="btn primary" type="button" data-act="go:done">Bezorgd, zet op afgerond</button></div>`,
+    done:`<p>Verkocht aan ${esc(d.buyer||"een koper")} voor <b class="mono">${eur(d.soldPrice||d.price)}</b>.${d.tracking?` Track &amp; trace: <span class="mono">${esc(d.tracking)}</span>${d.carrier?" ("+esc(d.carrier)+")":""}.`:""}</p>${d.trackPhoto?'<div class="r row"><button class="btn" type="button" data-act="show:trackPhoto">Track &amp; trace bekijken</button></div>':""}`
   }[d.status];
   $("scrim").innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
-    <div class="sheet-head"><h2 id="sh-t">${isNew?"New item":esc(d.title||"Edit item")}</h2><button class="x" type="button" data-act="close" aria-label="Close">×</button></div>
-    <div class="steps" aria-label="Progress">${STATUSES.map((s,i)=>`<div class="step${i<=si?" on":""}${i===si?" cur":""}"><i></i>${s.label}</div>`).join("")}</div>
+    <div class="sheet-head"><h2 id="sh-t">${isNew?"Nieuw item":esc(d.title||"Item bewerken")}</h2><button class="x" type="button" data-act="close" aria-label="Sluiten">×</button></div>
+    <div class="steps" aria-label="Voortgang">${STATUSES.map((s,i)=>`<div class="step${i<=si?" on":""}${i===si?" cur":""}"><i></i>${s.label}</div>`).join("")}</div>
     <div class="next">${nextBlock}</div>
-    <fieldset><legend>Photos</legend><div class="photos" id="photos"></div></fieldset>
-    <fieldset><legend>Listing</legend>
-      <label class="fld">Title<input type="text" id="f-title" value="${esc(d.title)}" placeholder="Levi's 501 straight jeans, mid blue"></label>
-      <div class="f2"><label class="fld">Brand<input type="text" id="f-brand" value="${esc(d.brand)}"></label>
-      <label class="fld">Size<input type="text" id="f-size" value="${esc(d.size)}" placeholder="M, W30 L32, 39"></label></div>
-      <div class="f2"><label class="fld">Category<select id="f-category">${opt(CATS,d.category)}</select></label>
-      <label class="fld">Condition<select id="f-condition">${opt(CONDS,d.condition)}</select></label></div>
-      <label class="fld">Asking price (€)<input type="number" id="f-price" inputmode="decimal" step="0.5" min="0" value="${esc(d.price??"")}"></label>
-      <label class="fld">Description<textarea id="f-description" placeholder="Fit, colour, material, any flaws, measurements">${esc(d.description)}</textarea></label>
-      <label class="fld">Private notes<input type="text" id="f-notes" value="${esc(d.notes)}" placeholder="Bought for €40, box under the bed"></label>
+    <fieldset><legend>Foto's</legend><div class="photos" id="photos"></div></fieldset>
+    <fieldset><legend>Advertentie</legend>
+      <label class="fld">Titel<input type="text" id="f-title" value="${esc(d.title)}" placeholder="Levi's 501 straight jeans, middenblauw"></label>
+      <div class="f2"><label class="fld">Merk<input type="text" id="f-brand" value="${esc(d.brand)}"></label>
+      <label class="fld">Maat<input type="text" id="f-size" value="${esc(d.size)}" placeholder="M, W30 L32, 39"></label></div>
+      <div class="f2"><label class="fld">Categorie<select id="f-category">${opt(CATS,d.category)}</select></label>
+      <label class="fld">Staat<select id="f-condition">${opt(CONDS,d.condition)}</select></label></div>
+      <label class="fld">Vraagprijs (€)<input type="number" id="f-price" inputmode="decimal" step="0.5" min="0" value="${esc(d.price??"")}"></label>
+      <label class="fld">Beschrijving<textarea id="f-description" placeholder="Pasvorm, kleur, materiaal, eventuele gebreken, maten">${esc(d.description)}</textarea></label>
+      <label class="fld">Eigen notities<input type="text" id="f-notes" value="${esc(d.notes)}" placeholder="Gekocht voor €40, doos onder het bed"></label>
     </fieldset>
     <div class="actions">
-      ${isNew?"<span></span>":`<button class="btn danger" type="button" data-act="del">${armDelete?"Tap again to delete":"Delete"}</button>`}
-      <div class="r">${si>0?'<button class="btn ghost" type="button" data-act="back">Step back</button>':""}<button class="btn" type="button" data-act="save">Save</button></div>
+      ${isNew?"<span></span>":`<button class="btn danger" type="button" data-act="del">${armDelete?"Tik nogmaals om te verwijderen":"Verwijderen"}</button>`}
+      <div class="r">${si>0?'<button class="btn ghost" type="button" data-act="back">Stap terug</button>':""}<button class="btn" type="button" data-act="save">Opslaan</button></div>
     </div></div>`;
   $("scrim").hidden=false; document.body.style.overflow="hidden";
   refreshSheetPhotos();
 }
 function refreshSheetPhotos(){
   const box=$("photos"); if(!box||!draft) return;
-  box.innerHTML=(draft.photos||[]).map((p,i)=>`<div class="ph"><img src="${esc(photoSrc(p))}" alt="Photo ${i+1}"><button type="button" data-rm="${i}" aria-label="Remove photo ${i+1}">×</button></div>`).join("")
-    +Array.from({length:pending},()=>'<div class="ph busy">Uploading…</div>').join("")
-    +`<label class="addph">Take photo<input type="file" id="f-cam" accept="image/*" capture="environment"></label>
-      <label class="addph">Choose from library<input type="file" id="f-lib" accept="image/*" multiple></label>`;
+  box.innerHTML=(draft.photos||[]).map((p,i)=>`<div class="ph"><img src="${esc(photoSrc(p))}" alt="Foto ${i+1}"><button type="button" data-rm="${i}" aria-label="Verwijder foto ${i+1}">×</button></div>`).join("")
+    +Array.from({length:pending},()=>'<div class="ph busy">Uploaden…</div>').join("")
+    +`<label class="addph">Foto maken<input type="file" id="f-cam" accept="image/*" capture="environment"></label>
+      <label class="addph">Kies uit fotobibliotheek<input type="file" id="f-lib" accept="image/*" multiple></label>`;
 }
 function readForm(){
   if(!draft) return;
@@ -500,19 +500,19 @@ function readForm(){
   for(const k of ["price","soldPrice"]){const el=$("f-"+k); if(el) draft[k]=el.value===""?null:Math.round(parseFloat(el.value.replace(",","."))*100)/100}
 }
 function listingText(d){
-  return [d.title, "", d.description, "", d.brand&&"Brand: "+d.brand, d.size&&"Size: "+d.size, d.condition&&"Condition: "+d.condition].filter(x=>x!==undefined&&x!==null&&x!==false).join("\n").replace(/\n{3,}/g,"\n\n").trim();
+  return [d.title, "", d.description, "", d.brand&&"Merk: "+d.brand, d.size&&"Maat: "+d.size, d.condition&&"Staat: "+d.condition].filter(x=>x!==undefined&&x!==null&&x!==false).join("\n").replace(/\n{3,}/g,"\n\n").trim();
 }
 async function copy(text){
-  try{await navigator.clipboard.writeText(text);toast("Listing text copied")}
+  try{await navigator.clipboard.writeText(text);toast("Advertentietekst gekopieerd")}
   catch(e){const ta=document.createElement("textarea");ta.className="copybox";ta.value=text;ta.rows=6;ta.readOnly=true;
-    document.querySelector(".next").appendChild(ta);ta.focus();ta.select();toast("Select and copy the text below")}
+    document.querySelector(".next").appendChild(ta);ta.focus();ta.select();toast("Selecteer en kopieer de tekst hieronder")}
 }
 $("scrim").addEventListener("change",e=>{
   if(e.target.id==="f-cam"||e.target.id==="f-lib"){readForm();addPhotos([...e.target.files])}
   if(e.target.dataset&&e.target.dataset.slot){readForm();addSlotImage(e.target.dataset.slot,e.target.files[0])}});
 $("scrim").addEventListener("click",async e=>{
   const cl=e.target.closest("a[data-copy]");
-  if(cl){readForm(); if(draft&&draft.tracking){navigator.clipboard?.writeText(draft.tracking).then(()=>toast("Number copied. Paste it on Vinted Go."),()=>{})} return}
+  if(cl){readForm(); if(draft&&draft.tracking){navigator.clipboard?.writeText(draft.tracking).then(()=>toast("Nummer gekopieerd. Plak het op Vinted Go."),()=>{})} return}
   if(e.target===$("scrim")){readForm();return closeSheet()}
   const rm=e.target.closest("[data-rm]");
   if(rm){const [p]=draft.photos.splice(+rm.dataset.rm,1); if(p&&p.id&&!items.some(i=>(i.photos||[]).some(x=>x.id===p.id))){try{await assets.delete(p.id)}catch(_){}} refreshSheetPhotos();return}
@@ -521,27 +521,27 @@ $("scrim").addEventListener("click",async e=>{
   if(act==="close"){return closeSheet()}
   readForm();
   if(act==="copy"){return copy(listingText(draft))}
-  if(act==="copytrack"){try{await navigator.clipboard.writeText(draft.tracking);toast("Number copied")}catch(_){toast(draft.tracking)};return}
+  if(act==="copytrack"){try{await navigator.clipboard.writeText(draft.tracking);toast("Nummer gekopieerd")}catch(_){toast(draft.tracking)};return}
   if(act.startsWith("show:")){return showViewer(act.slice(5))}
   if(act.startsWith("rm:")){const k=act.slice(3),c=draft[k];draft[k]=null;
     if(c&&c.id&&!items.some(i=>i[k]&&i[k].id===c.id)){try{await assets.delete(c.id)}catch(_){}}
     drawSheet();return}
-  if(pending){return toast("Wait for photos to finish uploading")}
+  if(pending){return toast("Wacht tot de foto's klaar zijn met uploaden")}
   if(act==="del"){
-    if(!armDelete){armDelete=true;b.textContent="Tap again to delete";return}
-    const it=draft; closeSheet(); await removeItem(it); return toast("Item deleted")}
+    if(!armDelete){armDelete=true;b.textContent="Tik nogmaals om te verwijderen";return}
+    const it=draft; closeSheet(); await removeItem(it); return toast("Item verwijderd")}
   if(act==="back"){draft.status=STATUSES[Math.max(0,stepIdx()-1)].k; drawSheet(); return}
   if(act.startsWith("go:")){
     const to=act.slice(3);
     if(to==="sold"&&draft.soldPrice==null) draft.soldPrice=draft.price;
     draft.status=to; draft.statusAt={...(draft.statusAt||{}),[to]:Date.now()};
   }
-  if(!draft.title){toast("Give the item a title");$("f-title")?.focus();return}
+  if(!draft.title){toast("Geef het item een titel");$("f-title")?.focus();return}
   delete draft.example;
   const it=draft;
   try{await saveItem(it);
-    if(act==="go:shipped"&&open){draft=it;drawSheet();$("scrim").querySelector(".sheet").scrollTop=0;toast("Marked as shipped");return}
-    closeSheet(); toast(act==="save"?"Saved":"Moved to "+STATUSES.find(s=>s.k===it.status).label)}catch(_){}
+    if(act==="go:shipped"&&open){draft=it;drawSheet();$("scrim").querySelector(".sheet").scrollTop=0;toast("Op verzonden gezet");return}
+    closeSheet(); toast(act==="save"?"Opgeslagen":"Verplaatst naar "+STATUSES.find(s=>s.k===it.status).label)}catch(_){}
 });
 document.addEventListener("keydown",e=>{if(e.key!=="Escape") return; if(!$("viewer").hidden) return hideViewer(); if(open){readForm();closeSheet()}});
 
