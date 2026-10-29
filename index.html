@@ -341,30 +341,35 @@ function parseTrack(text){
   if(!carrier) carrier=guessCarrier(code);
   return {code,carrier};
 }
-async function readTracking(blob){
+async function applyTracking(id,code,carrier){
+  if(draft&&draft.id===id){draft.tracking=code; if(carrier) draft.carrier=carrier; return}
+  const it=items.find(i=>i.id===id); if(!it||it.tracking) return;
+  const c=structuredClone(it); c.tracking=code; if(carrier) c.carrier=carrier;
+  try{await saveItem(c)}catch(_){}
+}
+async function readTracking(blob,id){
   reading=true; if(open) drawSheet();
   try{
     const w=await getOcr();
     const {data}=await w.recognize(blob);
     const r=parseTrack(data.text);
-    if(!draft) return;
-    if(r.code){draft.tracking=r.code; if(r.carrier) draft.carrier=r.carrier; toast("Gevonden: "+r.code+(r.carrier?" · "+r.carrier:"")+". Controleer of het klopt met de foto.")}
+    if(r.code){await applyTracking(id,r.code,r.carrier); toast("Gevonden: "+r.code+(r.carrier?" · "+r.carrier:"")+". Controleer of het klopt met de foto.")}
     else toast("Foto opgeslagen, maar er was geen nummer leesbaar. Typ het hieronder in.");
   }catch(e){toast(navigator.onLine?"Foto opgeslagen, maar hij kon niet worden gelezen. Typ het nummer hieronder in.":"Foto opgeslagen. Voor het lezen van het nummer is de eerste keer internet nodig.")}
   finally{reading=false; if(open) drawSheet()}
 }
 async function addSlotImage(slot,file){
   if(!draft||!file||!SLOTS[slot]) return;
-  busySlot=slot; pending++; drawSheet();
+  busySlot=slot; pending++; drawSheet(); const forId=draft.id; let readLater=null;
   try{
     const b=await shrink(file,1800,.9);
     const old=draft[slot];
     const r=await assets.upload(b); draft[slot]={id:r.id};
     if(old&&old.id&&!items.some(i=>i[slot]&&i[slot].id===old.id)){try{await assets.delete(old.id)}catch(_){}}
     delete draft.shipCodeText;
-    if(slot==="trackPhoto"){busySlot=null;await readTracking(b)} else toast(SLOTS[slot].saved);
+    if(slot==="trackPhoto") readLater=b; else toast(SLOTS[slot].saved);
   }catch(e){toast("Die afbeelding kon niet worden opgeslagen. Probeer een JPG of PNG kleiner dan 20 MB.")}
-  finally{busySlot=null;pending--;if(open) drawSheet()}
+  finally{busySlot=null;pending--;if(open) drawSheet(); if(readLater) readTracking(readLater,forId)}
 }
 function slotBlock(d,slot){
   const c=d[slot], t=SLOTS[slot];
@@ -443,7 +448,8 @@ const imgKey=p=>p?(p.id||p.data||""):"";
 const sig=o=>o?JSON.stringify([SIGK.map(k=>o[k]??""),(o.photos||[]).map(imgKey),imgKey(o.shipCode),imgKey(o.trackPhoto)]):"";
 async function closeAndSave(){
   readForm();
-  if(pending){toast("Wacht tot de foto's klaar zijn met uploaden");return}
+  if(pending){toast("Even wachten, de foto wordt opgeslagen…");while(pending) await new Promise(r=>setTimeout(r,150))}
+  if(!draft) return; readForm();
   const d=draft; if(!d) return closeSheet();
   const orig=items.find(i=>i.id===d.id);
   if(sig(d)===sig(orig)) return closeSheet();
@@ -542,7 +548,8 @@ $("scrim").addEventListener("click",async e=>{
   if(act.startsWith("rm:")){const k=act.slice(3),c=draft[k];draft[k]=null;
     if(c&&c.id&&!items.some(i=>i[k]&&i[k].id===c.id)){try{await assets.delete(c.id)}catch(_){}}
     drawSheet();return}
-  if(pending){return toast("Wacht tot de foto's klaar zijn met uploaden")}
+  if(pending){toast("Even wachten, de foto wordt opgeslagen…");while(pending) await new Promise(r=>setTimeout(r,150))}
+  if(!draft) return;
   if(act==="del"){
     if(!armDelete){armDelete=true;b.textContent="Tik nogmaals om te verwijderen";return}
     const it=draft; closeSheet(); await removeItem(it); return toast("Item verwijderd")}

@@ -1,5 +1,5 @@
 // Offline support: app files are cached on install; fonts and the text reader are cached the first time they load.
-const CACHE = "verzented-v2";
+const CACHE = "verzented-v3";
 const APP = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
