@@ -1,0 +1,553 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Verzented</title>
+<meta name="theme-color" content="#007782">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Verzented">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one column of hang-tag item cards, status rail on top, sheet editor slides up from the bottom */
+:root{
+  --bg:#f4f8f8; --surface:#ffffff; --ink:#171c1d; --muted:#647173; --line:#dfe7e8;
+  --accent:#007782; --accent-ink:#ffffff; --accent-soft:#e2f4f5;
+  --ok:#1a8a5a; --ok-soft:#ddf4e9; --warn:#b26200; --warn-soft:#fff0d9; --info:#2563d9; --info-soft:#e4ecfd;
+  --shadow:0 1px 2px rgba(0,60,66,.06),0 4px 14px rgba(0,60,66,.07);
+  --f-display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --f-body:"Instrument Sans","Helvetica Neue",Arial,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:calc(20px + env(safe-area-inset-top,0px));padding-bottom:calc(110px + env(safe-area-inset-bottom,0px))}
+.wrap{max-width:860px;margin:0 auto;display:grid;gap:18px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:1.9rem;font-weight:700}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.label{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.note{font-size:.85rem;color:var(--muted);max-width:60ch}
+.banner{background:var(--warn-soft);color:var(--warn);border-radius:10px;padding:10px 14px;font-size:.88rem}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.stat b{display:block;font:500 1.35rem/1.2 var(--f-mono);font-variant-numeric:tabular-nums;margin-top:2px}
+.stat.hot{border-color:var(--accent);background:var(--accent-soft)}
+.stat.hot b{color:var(--accent)}
+@media (max-width:560px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.rail{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:500;font-size:.9rem;display:flex;gap:6px;align-items:center}
+.chip span{font-family:var(--f-mono);font-size:.8rem;color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip[aria-pressed="true"] span{color:inherit;opacity:.7}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;text-align:left;padding:0;min-width:0}
+.card.attn{border-color:var(--accent)}
+.thumb{aspect-ratio:4/5;max-width:100%;background:var(--bg);display:grid;place-items:center;overflow:hidden;position:relative}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb svg{width:44%;height:auto;color:var(--muted);opacity:.55}
+.count{position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.55);color:#fff;font:500 .72rem var(--f-mono);padding:2px 7px;border-radius:6px}
+/* hang tag price */
+.tag{position:absolute;top:10px;right:10px;background:var(--accent);color:var(--accent-ink);font:500 .95rem var(--f-mono);padding:5px 10px 5px 18px;border-radius:4px 8px 8px 4px;clip-path:polygon(9px 0,100% 0,100% 100%,9px 100%,0 50%)}
+.tag::before{content:"";position:absolute;left:8px;top:50%;width:5px;height:5px;margin-top:-2.5px;border-radius:50%;background:var(--surface)}
+.body{padding:12px 14px 14px;display:grid;gap:6px;min-width:0}
+.body h3{font-size:1.05rem;font-weight:500;overflow-wrap:anywhere}
+.meta{font-size:.85rem;color:var(--muted)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.s-draft{background:var(--bg);color:var(--muted)}
+.s-listed{background:var(--info-soft);color:var(--info)}
+.s-sold{background:var(--accent-soft);color:var(--accent)}
+.s-shipped{background:var(--warn-soft);color:var(--warn)}
+.s-done{background:var(--ok-soft);color:var(--ok)}
+.ex{font-size:.7rem;border:1px dashed var(--muted);color:var(--muted);border-radius:6px;padding:1px 6px}
+.track{font-family:var(--f-mono);font-size:.8rem;color:var(--info);text-decoration:none;overflow-wrap:anywhere}
+
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:28px 20px;text-align:center;color:var(--muted)}
+
+.fab{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:14px 22px;font-weight:600;font-size:1rem;box-shadow:0 6px 20px rgba(0,119,130,.35);display:flex;gap:8px;align-items:center;z-index:5}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,14,24,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:640px;max-height:92%;overflow:auto;border-radius:18px 18px 0 0;
+  padding:18px max(18px,env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(18px,env(safe-area-inset-left,0px));display:grid;gap:16px}
+@media (min-width:700px){.scrim{align-items:center}.sheet{border-radius:18px;max-height:88%}}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.x{border:0;background:var(--bg);border-radius:999px;width:36px;height:36px;font-size:1.2rem;flex:none}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+.step{display:grid;gap:5px;font-size:.7rem;color:var(--muted);text-align:center}
+.step i{height:4px;border-radius:2px;background:var(--line)}
+.step.on i{background:var(--accent)}
+.step.cur{color:var(--ink);font-weight:600}
+fieldset{border:0;margin:0;padding:0;display:grid;gap:10px}
+legend{font-family:var(--f-display);font-weight:500;font-size:1.05rem;margin-bottom:8px;padding:0}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.f2{grid-template-columns:1fr}}
+label.fld{display:grid;gap:4px;font-size:.82rem;color:var(--muted);font-weight:500;min-width:0}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:1rem;color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+.photos{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.ph{position:relative;flex:none;width:86px;aspect-ratio:4/5;border-radius:10px;overflow:hidden;background:var(--bg)}
+.ph img{width:100%;height:100%;object-fit:cover}
+.ph button{position:absolute;top:4px;right:4px;border:0;border-radius:999px;width:24px;height:24px;background:rgba(0,0,0,.6);color:#fff;font-size:.85rem;line-height:1}
+.ph.busy{display:grid;place-items:center;font-size:.75rem;color:var(--muted)}
+.addph{flex:none;width:86px;aspect-ratio:4/5;border:1.5px dashed var(--line);border-radius:10px;display:grid;place-items:center;text-align:center;font-size:.78rem;color:var(--muted);cursor:pointer;padding:6px}
+.addph input{position:absolute;width:1px;height:1px;opacity:0}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 14px;font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.danger{color:#c62f2f;border-color:transparent;background:transparent}
+.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+.actions .r{display:flex;gap:8px;flex-wrap:wrap}
+.next{background:var(--accent-soft);border-radius:12px;padding:14px;display:grid;gap:10px}
+.next p{margin:0;font-size:.9rem}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:10px;font-size:.9rem;z-index:30}
+.copybox{width:100%;font-family:var(--f-mono);font-size:.8rem}
+.hid{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+label.btn{position:relative;display:inline-flex;align-items:center}
+a.btn{display:inline-flex;align-items:center;text-decoration:none;color:var(--ink)}
+.code{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.codeimg{flex:none;width:92px;aspect-ratio:9/19.5;max-width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0;overflow:hidden;position:relative}
+.codeimg img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top}
+.codeinfo{display:grid;gap:6px;min-width:0;font-size:.88rem}
+.codeinfo .mono{overflow-wrap:anywhere}
+.viewer{position:fixed;inset:0;z-index:40;background:#fff;color:#111;display:grid;grid-template-rows:auto 1fr auto;gap:12px;
+  padding:calc(14px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.viewer .vh{display:flex;justify-content:space-between;align-items:center;font:600 1rem var(--f-body)}
+.viewer .vh button{border:0;background:#eee;color:#111;border-radius:999px;padding:8px 16px;font-weight:600}
+.viewer img{width:100%;height:100%;object-fit:contain;min-height:0}
+.viewer .vc{text-align:center;font:500 1.05rem var(--f-mono);letter-spacing:.06em;overflow-wrap:anywhere}
+.foot{display:grid;gap:10px;border-top:1px solid var(--line);padding-top:16px;font-size:.85rem;color:var(--muted)}
+.foot p{margin:0;max-width:60ch}
+.qrmark{display:inline-flex;gap:4px;align-items:center;font-size:.78rem;color:var(--accent);font-weight:600}
+@media (prefers-reduced-motion:no-preference){.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="label">Seller log</div>
+      <h1>Verzented</h1>
+    </div>
+    <p class="note">Snap a photo, copy the listing text into Vinted, then track each piece from sold to delivered.</p>
+  </header>
+  
+
+  <section class="stats" aria-label="Summary">
+    <div class="stat" id="stShip"><div class="label">To ship</div><b id="nShip">0</b></div>
+    <div class="stat"><div class="label">Online</div><b id="nOnline">0</b></div>
+    <div class="stat"><div class="label">Listed value</div><b id="vOnline">€0</b></div>
+    <div class="stat"><div class="label">Earned</div><b id="vEarned">€0</b></div>
+  </section>
+
+  <nav class="rail" id="rail" aria-label="Filter by status"></nav>
+  <section class="grid" id="grid" aria-live="polite"></section>
+  <footer class="foot">
+    <p>Everything is saved on this phone only. Make a backup now and then, so nothing is lost if the app is removed.</p>
+    <div class="row"><button class="btn" type="button" id="exportBtn">Save backup</button>
+    <label class="btn">Restore backup<input type="file" id="importIn" accept="application/json,.json" class="hid"></label></div>
+  </footer>
+</div>
+
+<button class="fab" id="addBtn" type="button"><span aria-hidden="true">＋</span> Add item</button>
+<div class="scrim" id="scrim" hidden></div>
+<div class="toast" id="toast" hidden></div>
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="Shipping code"></div>
+
+<script>
+const STATUSES=[
+  {k:"draft",label:"To list"},
+  {k:"listed",label:"Online"},
+  {k:"sold",label:"Sold"},
+  {k:"shipped",label:"Shipped"},
+  {k:"done",label:"Completed"}];
+const CATS=["Tops & shirts","Trousers & jeans","Dresses & skirts","Jackets & coats","Shoes","Bags & accessories","Kids","Other"];
+const CONDS=["New with tags","New without tags","Very good","Good","Satisfactory"];
+const CARRIERS=["Vinted Go","PostNL","DHL","DPD","GLS","UPS","Other"];
+const ICONS={
+  "Tops & shirts":'<path d="M22 10l-12 8 6 10 6-3v29h20V25l6 3 6-10-12-8c-2 4-6 6-10 6s-8-2-10-6z"/>',
+  "Trousers & jeans":'<path d="M18 8h28l4 50h-11l-7-34-7 34H14z"/>',
+  "Dresses & skirts":'<path d="M24 8h16l-2 14 14 36H12l14-36z"/>',
+  "Jackets & coats":'<path d="M24 8l-14 8v42h18V20l4 10 4-10v38h18V16L40 8l-8 10z"/>',
+  "Shoes":'<path d="M8 40V24h12c2 6 8 8 16 9l16 3c4 1 6 4 6 8v2H8z"/>',
+  "Bags & accessories":'<path d="M14 24h36l-3 32H17zM24 24v-6a8 8 0 0116 0v6" fill="none" stroke="currentColor" stroke-width="4"/>',
+  "Kids":'<path d="M24 14l-10 6 4 8 4-2v22h20V26l4 2 4-8-10-6c-2 3-4 4-8 4s-6-1-8-4z"/>',
+  "Other":'<rect x="14" y="14" width="36" height="36" rx="6"/>'};
+const icon=c=>`<svg viewBox="0 0 64 64" fill="currentColor" aria-hidden="true">${ICONS[c]||ICONS.Other}</svg>`;
+const eur=n=>"€"+(Number(n)||0).toLocaleString("nl-NL",{minimumFractionDigits:Number(n)%1?2:0,maximumFractionDigits:2});
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $=id=>document.getElementById(id);
+
+function trackUrl(it){
+  const c=encodeURIComponent((it.tracking||"").trim()); if(!c) return "";
+  switch(it.carrier){
+    case "PostNL": return `https://postnl.nl/tracktrace/?B=${c}&D=NL&T=C`;
+    case "DHL": return `https://www.dhl.com/nl-nl/home/tracking.html?tracking-id=${c}`;
+    case "DPD": return `https://www.dpdgroup.com/nl/mydpd/my-parcels/incoming?parcelNumber=${c}`;
+    case "Vinted Go": return "https://vintedgo.com/tracking";
+    default: return `https://t.17track.net/en#nums=${c}`;
+  }
+}
+
+/* ---------- storage: IndexedDB on this phone ---------- */
+let items=[], filter="all";
+const urlCache=new Map();
+let dbp=null;
+function idb(){
+  if(dbp) return dbp;
+  dbp=new Promise((res,rej)=>{const r=indexedDB.open("resale-rack",1);
+    r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore("items",{keyPath:"id"});d.createObjectStore("photos")};
+    r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+  return dbp;
+}
+async function tx(store,mode,fn){
+  const d=await idb();
+  return new Promise((res,rej)=>{const t=d.transaction(store,mode);const st=t.objectStore(store);let out;
+    const r=fn(st); if(r) r.onsuccess=()=>{out=r.result};
+    t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)});
+}
+const assets={
+  async upload(blob){const id=uid();await tx("photos","readwrite",st=>st.put(blob,id));const url=URL.createObjectURL(blob);urlCache.set(id,url);return {id,url}},
+  async delete(id){await tx("photos","readwrite",st=>st.delete(id));const u=urlCache.get(id);if(u){URL.revokeObjectURL(u);urlCache.delete(id)}}
+};
+async function saveItem(it){
+  it.updatedAt=Date.now();
+  const clean=JSON.parse(JSON.stringify(it));
+  for(const p of [...(clean.photos||[]),clean.shipCode,clean.trackPhoto].filter(Boolean)) delete p.url;
+  try{await tx("items","readwrite",st=>st.put(clean))}catch(e){toast("Couldn't save. The phone's storage may be full.");throw e}
+  const i=items.findIndex(x=>x.id===it.id); if(i>=0) items[i]=clean; else items.push(clean); render();
+}
+async function removeItem(it){
+  for(const p of [...(it.photos||[]),it.shipCode,it.trackPhoto].filter(Boolean)) if(p.id){try{await assets.delete(p.id)}catch(e){}}
+  try{await tx("items","readwrite",st=>st.delete(it.id))}catch(e){toast("Couldn't delete. Try again.")}
+  items=items.filter(x=>x.id!==it.id); render();
+}
+async function boot(){
+  render();
+  try{
+    items=(await tx("items","readonly",st=>st.getAll()))||[];
+    const d=await idb();
+    await new Promise((res,rej)=>{const t=d.transaction("photos","readonly");const c=t.objectStore("photos").openCursor();
+      c.onsuccess=()=>{const cur=c.result;if(cur){urlCache.set(cur.key,URL.createObjectURL(cur.value));cur.continue()}};
+      t.oncomplete=res;t.onerror=()=>rej(t.error)});
+  }catch(e){toast("Couldn't open saved items on this phone.")}
+  render();
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+}
+
+/* ---------- backup ---------- */
+async function exportBackup(){
+  try{
+    const photos={};
+    for(const [id] of urlCache){const b=await tx("photos","readonly",st=>st.get(id)); if(b) photos[id]=await blobToData(b)}
+    const blob=new Blob([JSON.stringify({app:"resale-rack",version:1,items,photos})],{type:"application/json"});
+    const name="verzented-backup-"+new Date().toISOString().slice(0,10)+".json";
+    const file=new File([blob],name,{type:"application/json"});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000);
+  }catch(e){if(e&&e.name!=="AbortError") toast("Backup failed. Try again.")}
+}
+async function importBackup(file){
+  try{
+    const data=JSON.parse(await file.text());
+    if(data.app!=="resale-rack"||!Array.isArray(data.items)) throw new Error("bad");
+    for(const [id,url] of Object.entries(data.photos||{})){
+      const b=await (await fetch(url)).blob(); await tx("photos","readwrite",st=>st.put(b,id));
+      if(!urlCache.has(id)) urlCache.set(id,URL.createObjectURL(b));
+    }
+    for(const it of data.items){await tx("items","readwrite",st=>st.put(it)); const i=items.findIndex(x=>x.id===it.id); if(i>=0) items[i]=it; else items.push(it)}
+    render(); toast("Restored "+data.items.length+" items");
+  }catch(e){toast("That file isn't a Verzented backup.")}
+}
+$("exportBtn").addEventListener("click",exportBackup);
+$("importIn").addEventListener("change",e=>{if(e.target.files[0]) importBackup(e.target.files[0]); e.target.value=""});
+
+/* ---------- photos ---------- */
+async function shrink(file,max,q){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const s=Math.min(1,max/Math.max(img.width,img.height));
+    const cv=document.createElement("canvas");cv.width=Math.round(img.width*s);cv.height=Math.round(img.height*s);
+    cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);
+    return await new Promise(r=>cv.toBlob(r,"image/jpeg",q));
+  }finally{URL.revokeObjectURL(url)}
+}
+const blobToData=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+async function addPhotos(files){
+  if(!draft) return;
+  draft.photos=draft.photos||[];
+  for(const f of files){
+    if(!f.type.startsWith("image/")) continue;
+    pending++; refreshSheetPhotos();
+    try{
+      const b=await shrink(f,1400,.86); const r=await assets.upload(b); draft.photos.push({id:r.id})
+    }catch(e){toast("That photo didn't upload. Try a JPG or PNG under 20 MB.")}
+    finally{pending--; refreshSheetPhotos()}
+  }
+}
+const photoSrc=p=>p.data||(p.id&&urlCache.get(p.id))||"";
+
+/* ---------- shipping code + track & trace photos ---------- */
+const SLOTS={
+  shipCode:{add:"Add the QR code or label barcode",hint:"Photograph the label, or upload a screenshot of the QR code from the Vinted app.",
+    saved:"Shipping code saved",show:"Show at drop-off",busy:"Saving the code…"},
+  trackPhoto:{add:"Add the track & trace",hint:"Photograph the drop-off receipt, or upload a screenshot of the tracking from Vinted or Vinted Go.",
+    saved:"Track & trace saved",show:"View full screen",busy:"Saving the photo…"}};
+let busySlot=null, reading=false;
+function guessCarrier(code){
+  return /^VGS/.test(code)?"Vinted Go":/^3S/.test(code)?"PostNL":/^(JVGL|JJD)/.test(code)?"DHL":/^\d{14}$/.test(code)?"DPD":/^1Z/.test(code)?"UPS":"";
+}
+let ocrWorker=null;
+async function getOcr(){
+  if(ocrWorker) return ocrWorker;
+  if(!window.Tesseract){await new Promise((res,rej)=>{const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";sc.onload=res;sc.onerror=rej;document.head.appendChild(sc)})}
+  ocrWorker=await Tesseract.createWorker("eng");
+  return ocrWorker;
+}
+function parseTrack(text){
+  const T=String(text||"").toUpperCase();
+  let carrier=/VINTED\s*GO/.test(T)?"Vinted Go":/POST\s*NL/.test(T)?"PostNL":/\bDHL\b/.test(T)?"DHL":/\bDPD\b/.test(T)?"DPD":/\bGLS\b/.test(T)?"GLS":/\bUPS\b/.test(T)?"UPS":"";
+  const toks=T.replace(/[^A-Z0-9\s]/g," ").split(/\s+/).filter(Boolean);
+  const cands=[];
+  for(let i=0;i<toks.length;i++){cands.push(toks[i]); if(toks[i+1]) cands.push(toks[i]+toks[i+1])}
+  const fix=c=>c.replace(/^VG5/,"VGS").replace(/^(VGS)([0-9OIL]+)$/,(m,a,b)=>a+b.replace(/O/g,"0").replace(/[IL]/g,"1"));
+  const fixed=cands.map(fix);
+  let code=fixed.find(c=>/^(VGS\d{8,20}|3S[A-Z0-9]{8,24}|JVGL\d{8,24}|JJD\d{8,26}|1Z[A-Z0-9]{16}|\d{14})$/.test(c))||"";
+  if(!code) code=fixed.filter(c=>c.length>=10&&c.length<=30&&(c.match(/\d/g)||[]).length>=8).sort((a,b)=>b.length-a.length)[0]||"";
+  if(!carrier) carrier=guessCarrier(code);
+  return {code,carrier};
+}
+async function readTracking(blob){
+  reading=true; if(open) drawSheet();
+  try{
+    const w=await getOcr();
+    const {data}=await w.recognize(blob);
+    const r=parseTrack(data.text);
+    if(!draft) return;
+    if(r.code){draft.tracking=r.code; if(r.carrier) draft.carrier=r.carrier; toast("Found "+r.code+(r.carrier?" · "+r.carrier:"")+". Check it matches the photo.")}
+    else toast("Photo saved, but no number was readable. Type it below.");
+  }catch(e){toast(navigator.onLine?"Photo saved, but it couldn't be read. Type the number below.":"Photo saved. Reading the number needs internet the first time.")}
+  finally{reading=false; if(open) drawSheet()}
+}
+async function addSlotImage(slot,file){
+  if(!draft||!file||!SLOTS[slot]) return;
+  busySlot=slot; pending++; drawSheet();
+  try{
+    const b=await shrink(file,1800,.9);
+    const old=draft[slot];
+    const r=await assets.upload(b); draft[slot]={id:r.id};
+    if(old&&old.id&&!items.some(i=>i[slot]&&i[slot].id===old.id)){try{await assets.delete(old.id)}catch(_){}}
+    delete draft.shipCodeText;
+    if(slot==="trackPhoto"){busySlot=null;await readTracking(b)} else toast(SLOTS[slot].saved);
+  }catch(e){toast("That image didn't save. Try a JPG or PNG under 20 MB.")}
+  finally{busySlot=null;pending--;if(open) drawSheet()}
+}
+function slotBlock(d,slot){
+  const c=d[slot], t=SLOTS[slot];
+  if(busySlot===slot) return `<div class="code"><div class="codeinfo"><b>${t.busy}</b></div></div>`;
+  if(!c) return `<div class="code"><div class="codeinfo"><b>${t.add}</b>
+    <span class="muted">${t.hint}</span>
+    <div class="row"><label class="btn">Take photo<input type="file" id="f-cam-${slot}" data-slot="${slot}" accept="image/*" capture="environment" class="hid"></label>
+    <label class="btn">Upload screenshot<input type="file" id="f-lib-${slot}" data-slot="${slot}" accept="image/*" class="hid"></label></div></div></div>`;
+  return `<div class="code"><button type="button" class="codeimg" data-act="show:${slot}" aria-label="${t.show}"><img src="${esc(photoSrc(c))}" alt="${t.saved}"></button>
+    <div class="codeinfo"><b>${t.saved}</b>
+    <div class="row"><button class="btn primary" type="button" data-act="show:${slot}">${t.show}</button>
+    <button class="btn ghost" type="button" data-act="rm:${slot}">Remove</button></div></div></div>`;
+}
+const codeBlock=d=>slotBlock(d,"shipCode");
+let wake=null;
+async function showViewer(slot){
+  const d=draft; if(!d||!d[slot]) return;
+  const v=$("viewer");
+  v.innerHTML=`<div class="vh"><span>${esc(d.title||"Parcel")}</span><button type="button" id="vclose">Done</button></div>
+    <img src="${esc(photoSrc(d[slot]))}" alt="${SLOTS[slot].saved}">
+    <div class="vc">${esc(d.tracking||"")}</div>`;
+  v.hidden=false; $("vclose").focus();
+  try{wake=await navigator.wakeLock?.request("screen")}catch(e){wake=null}
+}
+function hideViewer(){$("viewer").hidden=true;$("viewer").innerHTML="";try{wake&&wake.release()}catch(e){}wake=null}
+$("viewer").addEventListener("click",e=>{if(e.target.id==="vclose") hideViewer()});
+
+/* ---------- list ---------- */
+function render(){
+  const by=k=>items.filter(i=>i.status===k);
+  const toShip=by("sold").length;
+  $("nShip").textContent=toShip; $("stShip").classList.toggle("hot",toShip>0);
+  $("nOnline").textContent=by("listed").length;
+  $("vOnline").textContent=eur(by("listed").reduce((a,i)=>a+(+i.price||0),0));
+  $("vEarned").textContent=eur(items.filter(i=>["sold","shipped","done"].includes(i.status)).reduce((a,i)=>a+(+(i.soldPrice||i.price)||0),0));
+  $("rail").innerHTML=[{k:"all",label:"All"},...STATUSES].map(s=>{
+    const n=s.k==="all"?items.length:by(s.k).length;
+    return `<button class="chip" type="button" data-f="${s.k}" aria-pressed="${filter===s.k}">${s.label}<span>${n}</span></button>`}).join("");
+  const order={sold:0,listed:1,draft:2,shipped:3,done:4};
+  const list=items.filter(i=>filter==="all"||i.status===filter).sort((a,b)=>(order[a.status]-order[b.status])||((b.updatedAt||0)-(a.updatedAt||0)));
+  if(!list.length){
+    $("grid").innerHTML=`<div class="empty" style="grid-column:1/-1">${items.length?"Nothing in this stage yet.":"Your rack is empty. Tap <b>Add item</b> to photograph your first piece."}</div>`;return}
+  $("grid").innerHTML=list.map(it=>{
+    const st=STATUSES.find(s=>s.k===it.status)||STATUSES[0];
+    const ph=(it.photos||[])[0];
+    const tu=trackUrl(it);
+    const price=it.status==="draft"||it.status==="listed"?it.price:(it.soldPrice||it.price);
+    return `<button class="card${it.status==="sold"?" attn":""}" type="button" data-id="${esc(it.id)}">
+      <div class="thumb">${ph?`<img src="${esc(photoSrc(ph))}" alt="" loading="lazy">`:icon(it.category)}
+        ${price?`<span class="tag">${eur(price)}</span>`:""}
+        ${(it.photos||[]).length>1?`<span class="count">${it.photos.length} photos</span>`:""}</div>
+      <div class="body">
+        <div class="row"><span class="pill s-${st.k}">${it.status==="sold"?"Sold · ship it":st.label}</span>${it.example?'<span class="ex">Example</span>':""}</div>
+        <h3>${esc(it.title||"Untitled item")}</h3>
+        <div class="meta">${esc([it.brand,it.size&&"Size "+it.size,it.condition].filter(Boolean).join(" · "))||"&nbsp;"}</div>
+        ${it.buyer&&it.status!=="draft"&&it.status!=="listed"?`<div class="meta">Buyer: ${esc(it.buyer)}</div>`:""}
+        ${it.shipCode&&it.status==="sold"?'<span class="qrmark">▦ Shipping code ready</span>':""}${it.trackPhoto&&it.status==="shipped"?'<span class="qrmark">✓ Track &amp; trace saved</span>':""}
+        ${tu&&(it.status==="shipped"||it.status==="done")?`<div class="meta">${esc(it.carrier)} · <span class="track">${esc(it.tracking)}</span></div>`:""}
+      </div></button>`}).join("");
+}
+$("rail").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(b){filter=b.dataset.f;render()}});
+$("grid").addEventListener("click",e=>{const b=e.target.closest("[data-id]");if(b) openSheet(items.find(i=>i.id===b.dataset.id))});
+$("addBtn").addEventListener("click",()=>openSheet(null));
+
+/* ---------- editor sheet ---------- */
+let draft=null, open=false, pending=0, armDelete=false;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+function opt(list,v){return list.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}
+function openSheet(it){
+  draft=it?structuredClone(it):{id:uid(),status:"draft",photos:[],category:"Tops & shirts",condition:"Very good",carrier:"PostNL",createdAt:Date.now()};
+  open=true; armDelete=false; drawSheet();
+}
+function closeSheet(){open=false;draft=null;$("scrim").hidden=true;$("scrim").innerHTML="";document.body.style.overflow=""}
+function stepIdx(){return STATUSES.findIndex(s=>s.k===draft.status)}
+function drawSheet(){
+  const d=draft, si=stepIdx(), isNew=!items.some(i=>i.id===d.id);
+  const tu=trackUrl(d);
+  const nextBlock={
+    draft:`<p>Ready to post? Copy the listing text, paste it into Vinted with your photos, then mark it online.</p>
+      <div class="r row"><button class="btn" type="button" data-act="copy">Copy listing text</button><button class="btn primary" type="button" data-act="go:listed">Mark as online</button></div>`,
+    listed:`<p>Got a buyer? Note who bought it and the final price.</p>
+      <div class="f2"><label class="fld">Buyer (Vinted username)<input type="text" id="f-buyer" value="${esc(d.buyer)}" autocomplete="off"></label>
+      <label class="fld">Sold for (€)<input type="number" id="f-soldPrice" inputmode="decimal" step="0.5" min="0" value="${esc(d.soldPrice??d.price??"")}"></label></div>
+      <div class="r row"><button class="btn primary" type="button" data-act="go:sold">Mark as sold</button></div>`,
+    sold:`<p>Get the shipping label or QR code in Vinted, add it here, and drop off the parcel.</p>
+      ${codeBlock(d)}
+      <div class="r row"><button class="btn primary" type="button" data-act="go:shipped">Mark as shipped</button></div>`,
+    shipped:`<p>Your parcel is on its way. Add a photo of the shipping proof and the number and carrier fill in for you.</p>
+      ${slotBlock(d,"trackPhoto")}
+      ${reading?'<p class="muted">Reading the number…</p>':""}
+      <div class="f2"><label class="fld">Carrier<select id="f-carrier">${opt(CARRIERS,d.carrier)}</select></label>
+      <label class="fld">Track &amp; trace number<input type="text" id="f-tracking" value="${esc(d.tracking)}" autocomplete="off" autocapitalize="characters" class="mono"></label></div>
+      <div class="r row">
+        ${d.tracking?`<button class="btn" type="button" data-act="copytrack">Copy number</button>`:""}
+        ${(!d.carrier||d.carrier==="Vinted Go")?`<a class="btn" href="https://vintedgo.com/tracking" target="_blank" rel="noopener" data-copy="1">Open vintedgo.com ↗</a>`:(tu?`<a class="btn" href="${esc(tu)}" target="_blank" rel="noopener">Track on ${esc(d.carrier)} ↗</a>`:"")}
+        ${d.tracking?`<a class="btn" href="https://t.17track.net/en#nums=${encodeURIComponent(d.tracking)}" target="_blank" rel="noopener">Live status ↗</a>`:""}
+      </div>
+      <div class="r row"><button class="btn primary" type="button" data-act="go:done">Delivered, mark completed</button></div>`,
+    done:`<p>Sold to ${esc(d.buyer||"a buyer")} for <b class="mono">${eur(d.soldPrice||d.price)}</b>.${d.tracking?` Tracking: <span class="mono">${esc(d.tracking)}</span>${d.carrier?" ("+esc(d.carrier)+")":""}.`:""}</p>${d.trackPhoto?'<div class="r row"><button class="btn" type="button" data-act="show:trackPhoto">View track &amp; trace</button></div>':""}`
+  }[d.status];
+  $("scrim").innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
+    <div class="sheet-head"><h2 id="sh-t">${isNew?"New item":esc(d.title||"Edit item")}</h2><button class="x" type="button" data-act="close" aria-label="Close">×</button></div>
+    <div class="steps" aria-label="Progress">${STATUSES.map((s,i)=>`<div class="step${i<=si?" on":""}${i===si?" cur":""}"><i></i>${s.label}</div>`).join("")}</div>
+    <div class="next">${nextBlock}</div>
+    <fieldset><legend>Photos</legend><div class="photos" id="photos"></div></fieldset>
+    <fieldset><legend>Listing</legend>
+      <label class="fld">Title<input type="text" id="f-title" value="${esc(d.title)}" placeholder="Levi's 501 straight jeans, mid blue"></label>
+      <div class="f2"><label class="fld">Brand<input type="text" id="f-brand" value="${esc(d.brand)}"></label>
+      <label class="fld">Size<input type="text" id="f-size" value="${esc(d.size)}" placeholder="M, W30 L32, 39"></label></div>
+      <div class="f2"><label class="fld">Category<select id="f-category">${opt(CATS,d.category)}</select></label>
+      <label class="fld">Condition<select id="f-condition">${opt(CONDS,d.condition)}</select></label></div>
+      <label class="fld">Asking price (€)<input type="number" id="f-price" inputmode="decimal" step="0.5" min="0" value="${esc(d.price??"")}"></label>
+      <label class="fld">Description<textarea id="f-description" placeholder="Fit, colour, material, any flaws, measurements">${esc(d.description)}</textarea></label>
+      <label class="fld">Private notes<input type="text" id="f-notes" value="${esc(d.notes)}" placeholder="Bought for €40, box under the bed"></label>
+    </fieldset>
+    <div class="actions">
+      ${isNew?"<span></span>":`<button class="btn danger" type="button" data-act="del">${armDelete?"Tap again to delete":"Delete"}</button>`}
+      <div class="r">${si>0?'<button class="btn ghost" type="button" data-act="back">Step back</button>':""}<button class="btn" type="button" data-act="save">Save</button></div>
+    </div></div>`;
+  $("scrim").hidden=false; document.body.style.overflow="hidden";
+  refreshSheetPhotos();
+}
+function refreshSheetPhotos(){
+  const box=$("photos"); if(!box||!draft) return;
+  box.innerHTML=(draft.photos||[]).map((p,i)=>`<div class="ph"><img src="${esc(photoSrc(p))}" alt="Photo ${i+1}"><button type="button" data-rm="${i}" aria-label="Remove photo ${i+1}">×</button></div>`).join("")
+    +Array.from({length:pending},()=>'<div class="ph busy">Uploading…</div>').join("")
+    +`<label class="addph">Take photo<input type="file" id="f-cam" accept="image/*" capture="environment"></label>
+      <label class="addph">Choose from library<input type="file" id="f-lib" accept="image/*" multiple></label>`;
+}
+function readForm(){
+  if(!draft) return;
+  for(const k of ["title","brand","size","category","condition","description","notes","buyer","carrier","tracking"]){const el=$("f-"+k); if(el) draft[k]=el.value.trim()}
+  for(const k of ["price","soldPrice"]){const el=$("f-"+k); if(el) draft[k]=el.value===""?null:Math.round(parseFloat(el.value.replace(",","."))*100)/100}
+}
+function listingText(d){
+  return [d.title, "", d.description, "", d.brand&&"Brand: "+d.brand, d.size&&"Size: "+d.size, d.condition&&"Condition: "+d.condition].filter(x=>x!==undefined&&x!==null&&x!==false).join("\n").replace(/\n{3,}/g,"\n\n").trim();
+}
+async function copy(text){
+  try{await navigator.clipboard.writeText(text);toast("Listing text copied")}
+  catch(e){const ta=document.createElement("textarea");ta.className="copybox";ta.value=text;ta.rows=6;ta.readOnly=true;
+    document.querySelector(".next").appendChild(ta);ta.focus();ta.select();toast("Select and copy the text below")}
+}
+$("scrim").addEventListener("change",e=>{
+  if(e.target.id==="f-cam"||e.target.id==="f-lib"){readForm();addPhotos([...e.target.files])}
+  if(e.target.dataset&&e.target.dataset.slot){readForm();addSlotImage(e.target.dataset.slot,e.target.files[0])}});
+$("scrim").addEventListener("click",async e=>{
+  const cl=e.target.closest("a[data-copy]");
+  if(cl){readForm(); if(draft&&draft.tracking){navigator.clipboard?.writeText(draft.tracking).then(()=>toast("Number copied. Paste it on Vinted Go."),()=>{})} return}
+  if(e.target===$("scrim")){readForm();return closeSheet()}
+  const rm=e.target.closest("[data-rm]");
+  if(rm){const [p]=draft.photos.splice(+rm.dataset.rm,1); if(p&&p.id&&!items.some(i=>(i.photos||[]).some(x=>x.id===p.id))){try{await assets.delete(p.id)}catch(_){}} refreshSheetPhotos();return}
+  const b=e.target.closest("[data-act]"); if(!b) return;
+  const act=b.dataset.act;
+  if(act==="close"){return closeSheet()}
+  readForm();
+  if(act==="copy"){return copy(listingText(draft))}
+  if(act==="copytrack"){try{await navigator.clipboard.writeText(draft.tracking);toast("Number copied")}catch(_){toast(draft.tracking)};return}
+  if(act.startsWith("show:")){return showViewer(act.slice(5))}
+  if(act.startsWith("rm:")){const k=act.slice(3),c=draft[k];draft[k]=null;
+    if(c&&c.id&&!items.some(i=>i[k]&&i[k].id===c.id)){try{await assets.delete(c.id)}catch(_){}}
+    drawSheet();return}
+  if(pending){return toast("Wait for photos to finish uploading")}
+  if(act==="del"){
+    if(!armDelete){armDelete=true;b.textContent="Tap again to delete";return}
+    const it=draft; closeSheet(); await removeItem(it); return toast("Item deleted")}
+  if(act==="back"){draft.status=STATUSES[Math.max(0,stepIdx()-1)].k; drawSheet(); return}
+  if(act.startsWith("go:")){
+    const to=act.slice(3);
+    if(to==="sold"&&draft.soldPrice==null) draft.soldPrice=draft.price;
+    draft.status=to; draft.statusAt={...(draft.statusAt||{}),[to]:Date.now()};
+  }
+  if(!draft.title){toast("Give the item a title");$("f-title")?.focus();return}
+  delete draft.example;
+  const it=draft;
+  try{await saveItem(it);
+    if(act==="go:shipped"&&open){draft=it;drawSheet();$("scrim").querySelector(".sheet").scrollTop=0;toast("Marked as shipped");return}
+    closeSheet(); toast(act==="save"?"Saved":"Moved to "+STATUSES.find(s=>s.k===it.status).label)}catch(_){}
+});
+document.addEventListener("keydown",e=>{if(e.key!=="Escape") return; if(!$("viewer").hidden) return hideViewer(); if(open){readForm();closeSheet()}});
+
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400)}
+boot();
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+</script>
+</body>
+</html>
